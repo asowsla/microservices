@@ -1,0 +1,39 @@
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from sqlmodel import SQLModel
+from sqlalchemy import text
+from typing import AsyncIterator
+from shared.core.db_config import engine
+from API import products
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    async with engine.connect() as conn:
+        await conn.execute(text("SELECT 1"))
+        await conn.close()
+
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+
+    yield
+
+
+app = FastAPI(
+    title="Purchase Service API",
+    description="API for product purchasing operations",
+    lifespan=lifespan
+)
+
+
+app.include_router(
+    products.router,
+    tags=["Products"]
+)
+
+
+@app.get("/health", tags=["Health"])
+async def health_check() -> dict[str, str]:
+    return {"status": "ok", "service": "purchase-service"}
+
+
