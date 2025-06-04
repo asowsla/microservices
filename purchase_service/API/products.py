@@ -9,13 +9,15 @@ from typing import Annotated, Optional
 from fastapi.security import HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from configs.db_config import get_db
-from models.products import Product
+from services.products import get_user_products
+from models.products import Product, UserProduct
 from models.users import User
 from models.security import get_current_user
 from services.search_proxy import search_products_proxy
 from services.products import (get_all_products,
                                get_product_by_id,
-                               purchase_product_by_id)
+                               purchase_product_by_id,
+                               return_product_by_id)
 
 
 router = APIRouter(prefix="/products", tags=["Products"])
@@ -75,7 +77,7 @@ async def purchase_product(
     product_id: int,
     current_user: User = Depends(get_current_user)  
 )-> dict:
-    success = await purchase_product_by_id(db, product_id)
+    success = await purchase_product_by_id(db, product_id, current_user.id)
     if not success:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
@@ -83,7 +85,42 @@ async def purchase_product(
         )
     
     return {
-        "status": "Purchase successful",
+        "status": "purchase successful",
         "product_id": product_id,
         "user": current_user.username
     }
+
+
+@router.post("/return/{product_id}")
+async def return_product(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    product_id: int,
+    current_user: User = Depends(get_current_user)
+) -> dict:
+    success = await return_product_by_id(db, product_id, current_user.id)
+    if not success:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="product return failed"
+        )
+    
+    return {
+        "status": "return successful",
+        "product_id": product_id,
+        "user": current_user.id
+    }
+
+
+@router.get("/user-products/{user_id}", response_model=list[UserProduct])
+async def get_user_products_list(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> list[UserProduct]:
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="can only view your own products"
+        )
+    
+    return await get_user_products(db, user_id)

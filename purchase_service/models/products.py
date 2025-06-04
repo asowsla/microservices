@@ -1,7 +1,11 @@
-from sqlmodel import SQLModel, Text, DateTime, Field
+from sqlmodel import (SQLModel,
+                      Text,
+                      DateTime,
+                      Field,
+                      Relationship)
 from typing import Optional
 from pydantic import ConfigDict
-from datetime import datetime as dt, timezone
+from datetime import datetime, timezone
 
 
 class ProductBase(SQLModel):
@@ -29,13 +33,13 @@ class Product(ProductBase, table=True):
 
     product_id: Optional[int] = Field(default=None, primary_key=True)
 
-    create_time: dt = Field(
-        default_factory=lambda: dt.now(timezone.utc),
+    create_time: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
         sa_type=DateTime(timezone=True)
     )
 
-    update_time: dt = Field(
-        default_factory=lambda: dt.now(timezone.utc),
+    update_time: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
         sa_type=DateTime(timezone=True)
     )
 
@@ -56,3 +60,31 @@ class ProductUpdate(SQLModel):
         ge=0,
         description="quantity of product"
     )
+
+
+class UserProduct(SQLModel, table=True):
+    __tablename__ = "users"
+    
+    id: Optional[int] = Field(
+        default=None,
+        primary_key=True
+        )
+    
+    product_id: int = Field(
+        foreign_key="products.product_id"
+        )
+    
+    user_id: int = Field(
+        foreign_key="users.id"
+        )
+    
+    purchase_date: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_type=DateTime(timezone=True)
+        )
+    
+    status: str = Field(
+        default="purchased"
+        )
+
+    product: Product = Relationship()
