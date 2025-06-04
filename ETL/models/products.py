@@ -8,12 +8,15 @@ class ProductBase(SQLModel):
     model_config = ConfigDict(
         from_attributes=True
         )
+    
     product_name: str = Field(
         max_length=100
         )
+    
     product_description: str = Field(
         sa_type=Text
         )
+    
     count_left: int = Field(ge=0)
 
 
@@ -26,10 +29,12 @@ class Product(ProductBase, table=True):
 
     product_id: Optional[int] = Field(default=None,
                                       primary_key=True)
+    
     create_time: dt = Field(
         default_factory=lambda: dt.now(timezone.utc),
         sa_type=DateTime(timezone=True)
     )
+    
     update_time: dt = Field(
         default_factory=lambda: dt.now(timezone.utc),
         sa_type=DateTime(timezone=True)
@@ -41,10 +46,12 @@ class ProductUpdate(SQLModel):
         None,
         description="new name of product"
     )
+
     product_description: Optional[str] = Field(
         None,
         description="new description of product"
     )
+
     count_left: Optional[int] = Field(
         None,
         ge=0,

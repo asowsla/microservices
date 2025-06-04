@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 from API.search import router as search_router
 from services.index_init import ensure_index_exists
-from shared.core.db_config import es, INDEX
+from configs.db_config import es, INDEX
 
 
 @asynccontextmanager
@@ -13,7 +13,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
-    title="Product Search Service",
+    title="search_service API",
     lifespan=lifespan
 )
 

@@ -1,10 +1,12 @@
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from shared.models.products import Product
+from models.products import Product
 from repositories.products import ProductRepository
 
 
-async def get_all_products(db: AsyncSession) -> List[Product]:
+async def get_all_products(
+        db: AsyncSession
+) -> List[Product]:
     repo = ProductRepository(db)
     return await repo.get_all()
 

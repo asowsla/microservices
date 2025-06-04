@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from extractor import extract_updated_products
 from loader import load_to_elasticsearch
-from shared.core.db_config import get_db_session_instance
+from configs.db_config import get_db_session_instance
 
 
 # variable to track last time synchonization

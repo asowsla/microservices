@@ -2,7 +2,7 @@ from datetime import datetime as dt, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 from typing import Optional
-from shared.models.products import Product, ProductCreate, ProductUpdate
+from models.products import Product, ProductCreate, ProductUpdate
 
 
 async def create_product(
@@ -23,7 +23,8 @@ async def update_product(
     product_id: int,
     product: ProductUpdate
 ) -> Optional[Product]:
-    result = await db.execute(select(Product).where(Product.product_id == product_id))
+    result = await db.execute(
+        select(Product).where(Product.product_id == product_id))
     db_product = result.scalar_one_or_none()
 
     if not db_product:

@@ -1,7 +1,7 @@
 from typing import List, Optional
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from shared.models.products import Product
+from models.products import Product
 
 
 class ProductRepository:

@@ -23,25 +23,22 @@ class Settings(BaseSettings):
     @property
     def postgres_url(self) -> str:
         return (
-            f"postgresql+asyncpg://"
-            f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
-            f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/"
-            f"{self.POSTGRES_DB}"
+            f"postgresql+asyncpg://{self.POSTGRES_USER}:"
+            f"{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:"
+            f"{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
     
     @property
     def elastic_search_url(self) -> str:
         return (
-            f"http://{self.ELASTICSEARCH_HOST}:"
-            f"{self.ELASTICSEARCH_PORT}"
+            f"http://{self.ELASTICSEARCH_HOST}:{self.ELASTICSEARCH_PORT}"
         )
 
     @property
     def search_service_url(self) -> str:
         return (
             f"http://{self.SEARCH_SERVICE_HOST}:"
-            f"{self.SEARCH_SERVICE_PORT}"
-            f"{self.SEARCH_SERVICE_PATH}"
+            f"{self.SEARCH_SERVICE_PORT}{self.SEARCH_SERVICE_PATH}"
         )
     
     class Config:

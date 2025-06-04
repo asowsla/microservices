@@ -2,12 +2,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlmodel import SQLModel
 from sqlalchemy import text
-from shared.core.db_config import engine
+from typing import AsyncIterator
+from configs.db_config import engine
 from API import products
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI)  -> AsyncIterator[None]:
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
 
@@ -18,8 +19,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Admin Panel API",
-    description="API for administrative product control",
+    title="admin_panel API",
     lifespan=lifespan
 )
 

@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from sqlmodel import SQLModel
 from sqlalchemy import text
 from typing import AsyncIterator
-from shared.core.db_config import engine
+from configs.db_config import engine
 from API import products
 
 
@@ -20,8 +20,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
-    title="Purchase Service API",
-    description="API for product purchasing operations",
+    title="purchase_service API",
     lifespan=lifespan
 )
 

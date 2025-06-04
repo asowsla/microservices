@@ -2,21 +2,15 @@ from http import HTTPStatus
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from shared.core.db_config import get_db
-from shared.models.products import Product
+from configs.db_config import get_db
+from models.products import Product
 from services.search_proxy import search_products_proxy
-from services.products import (
-    get_all_products, 
-    get_product_by_id, 
-    purchase_product_by_id
-)
+from services.products import (get_all_products,
+                               get_product_by_id,
+                               purchase_product_by_id)
 
 
 router = APIRouter(prefix="/products", tags=["Products"])
-
-NOT_FOUND = HTTPStatus.NOT_FOUND
-BAD_REQUEST = HTTPStatus.BAD_REQUEST
-BAD_GATEWAY = HTTPStatus.BAD_GATEWAY
 
 
 # retrieves a list of all available products
@@ -28,25 +22,24 @@ async def list_products(
 
 
 # searching products by name or description using ElasticSearch
-@router.get("/search", summary="search products")
+@router.get("/search", summary="search products",
+            responses={HTTPStatus.BAD_GATEWAY: {"description": "bad gateway"}})
 async def search_products(
-    name: Annotated[str | None, 
-                    Query(description="Product name filter")] = None,
-    description: Annotated[str | None, 
-                           Query(description="Product description filter")] = None
+    name: Annotated[str | None, Query(description="Product name filter")] = None,
+    description: Annotated[str | None, Query(description="Product description filter")] = None
 ) -> list[Product]:
     try:
         return await search_products_proxy(name, description)
     except ConnectionError:
         raise HTTPException(
             status_code=HTTPStatus.BAD_GATEWAY,
-            detail=BAD_GATEWAY
+            detail="search service unavailable"
         )
 
 
 @router.get("/{product_id}", response_model=Product, 
             summary="get product details by ID",
-            responses={HTTPStatus.NOT_FOUND: {"description": NOT_FOUND}}
+            responses={HTTPStatus.NOT_FOUND: {"description": "not found"}}
     )
 async def get_product(
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -56,13 +49,13 @@ async def get_product(
     if not product:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail=NOT_FOUND
+            detail="product not found"
         )
     return product
 
 
 @router.post("/purchase/{product_id}", summary="purchase product by ID",
-             responses={HTTPStatus.BAD_REQUEST: {"description": BAD_REQUEST}}
+             responses={HTTPStatus.BAD_REQUEST: {"description": "bad request"}}
     )
 async def purchase_product(
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -72,6 +65,6 @@ async def purchase_product(
     if not success:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail=BAD_REQUEST
+            detail="purchase failed"
         )
     return {"status": "successfully purchased", "product_id": product_id}

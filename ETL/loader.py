@@ -1,6 +1,6 @@
 from typing import List
-from shared.models.products import Product
-from shared.core.db_config import es, INDEX
+from models.products import Product
+from configs.db_config import es, INDEX
 
 
 # uploading products one-by-one in Elasticsearch

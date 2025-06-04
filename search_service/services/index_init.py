@@ -2,7 +2,7 @@ from typing import Union, Dict, Type, get_args, get_origin
 from datetime import datetime
 from sqlmodel import SQLModel
 from elasticsearch import AsyncElasticsearch
-from shared.models.products import Product
+from models.products import Product
 
 
 PYDANTIC_TO_ES_TYPE_MAPPING = {
@@ -15,7 +15,9 @@ PYDANTIC_TO_ES_TYPE_MAPPING = {
 
 
 # extracting the underlying field type
-def get_underlying_field_type(field_type: type) -> type:
+def get_underlying_field_type(
+        field_type: type
+) -> type:
     if get_origin(field_type) is Union:
         field_type = [arg for arg in get_args(field_type) 
                       if arg is not type(None)][0]
@@ -24,7 +26,9 @@ def get_underlying_field_type(field_type: type) -> type:
 
 
 # generating Elasticsearch mappings from a SQLModel class
-def generate_es_mappings(model: Type[SQLModel]) -> Dict:
+def generate_es_mappings(
+        model: Type[SQLModel]
+) -> Dict:
     properties = {}
 
     for field_name, field in model.model_fields.items():

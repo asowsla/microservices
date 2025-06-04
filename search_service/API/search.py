@@ -6,21 +6,19 @@ from services.search import search_products
 
 router = APIRouter(prefix="/search", tags=["Search"])
 
-BAD_REQUEST = HTTPStatus.BAD_REQUEST
-BAD_GATEWAY = HTTPStatus.BAD_GATEWAY
-
 
 @router.get("/", summary="Search products", 
-            description="Search products by name or description", response_model=List[Dict]
-    )
+            description="Search products by name or description", 
+            response_model=List[Dict]
+        )
 async def search(
     name: Optional[str] = Query(None),
     description: Optional[str] = Query(None)
 ) -> None:
     if not name and not description:
         raise HTTPException(
-            status_code=BAD_REQUEST,
-            detail=BAD_REQUEST
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="name and description doesnt match"
         )
 
     try:
@@ -28,6 +26,6 @@ async def search(
         return results
     except Exception as e:
         raise HTTPException(
-            status_code=BAD_GATEWAY,
-            detail=BAD_GATEWAY
+            status_code=HTTPStatus.BAD_GATEWAY,
+            detail="bad gateway"
         )
