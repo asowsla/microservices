@@ -1,25 +1,30 @@
-from shared.core.db_config import es, INDEX, SIZE
+from configs.db_config import es, INDEX, SIZE
+from typing import Optional, List, Dict
 
 
 async def search_products(
-    name: str | None = None, 
-    description: str | None = None
-):
-    must_clauses = []
-
+    name: Optional[str] = None,
+    description: Optional[str] = None
+) -> List[Dict]:
+    query_filters = []
+    
     if name:
-        must_clauses.append({"match": {"product_name": name}})
+        query_filters.append({"match": {"product_name": name}})
     if description:
-        must_clauses.append({"match": {"product_description": description}})
+        query_filters.append({"match": {"product_description": description}})
 
-    query = {
+    search_query = {
         "size": SIZE,
         "query": {
             "bool": {
-                "must": must_clauses
+                "must": query_filters if query_filters else {"match_all": {}}
             }
         }
     }
 
-    response = await es.search(index=INDEX, body=query)
+    response = await es.search(
+        index=INDEX,
+        body=search_query
+    )
+
     return [hit["_source"] for hit in response["hits"]["hits"]]

@@ -2,7 +2,7 @@ from datetime import datetime as dt
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
-from shared.models.products import Product
+from models.products import Product
 
 
 async def extract_updated_products(

@@ -28,7 +28,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./shared:/app/shared
+      - ./purchase_service/configs:/app/configs
+      - ./purchase_service/models:/app/models
 
   elasticsearch:
     image: elasticsearch:8.12.1
@@ -62,7 +63,8 @@ services:
       elasticsearch:
         condition: service_healthy
     volumes:
-      - ./shared:/app/shared
+      - ./search_service/configs:/app/configs
+      - ./search_service/models:/app/models
 
   etl_process:
     container_name: ETL
@@ -76,7 +78,8 @@ services:
         condition: service_healthy
     restart: unless-stopped
     volumes:
-      - ./shared:/app/shared
+      - ./ETL/configs:/app/configs
+      - ./ETL/models:/app/models 
 
   admin_panel:
     container_name: admin_panel
@@ -89,7 +92,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./shared:/app/shared
+      - ./admin_panel/configs:/app/configs
+      - ./admin_panel/models:/app/models
 
 volumes:
   postgres_data:

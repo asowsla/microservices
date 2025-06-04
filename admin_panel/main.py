@@ -3,12 +3,12 @@ from fastapi import FastAPI
 from sqlmodel import SQLModel
 from sqlalchemy import text
 from typing import AsyncIterator
-from shared.core.db_config import engine
+from configs.db_config import engine
 from API import products, auth
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI)  -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
 
@@ -19,15 +19,13 @@ async def lifespan(app: FastAPI)  -> AsyncIterator[None]:
 
 
 app = FastAPI(
-    title="Admin Panel API",
-    description="API for administrative product control",
+    title="admin_Panel API",
     lifespan=lifespan
 )
 
 
-# connecting routers
-app.include_router(products.router)
 app.include_router(auth.router)
+app.include_router(products.router)
 
 
 @app.get("/health", tags=["Health"])

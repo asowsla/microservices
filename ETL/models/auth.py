@@ -5,9 +5,10 @@ class Token(BaseModel):
     access_token: str = Field(
         description="JWT access token"
     )
+
     token_type: str = Field(
         default="bearer",
-        description="Token type"
+        description="token type"
     )
 
 class TokenData(BaseModel):
@@ -22,9 +23,11 @@ class UserCreate(BaseModel):
         max_length=50,
         description="unique username"
     )
+
     email: EmailStr = Field(
         description="valid email address"
     )
+    
     password: str = Field(
         min_length=3,
         max_length=20,
@@ -35,6 +38,7 @@ class UserLogin(BaseModel):
     username: str = Field(
         description="registered username"
     )
+
     password: str = Field(
         description="user's password"
     )

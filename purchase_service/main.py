@@ -2,12 +2,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlmodel import SQLModel
 from sqlalchemy import text
-from shared.core.db_config import engine
+from typing import AsyncIterator
+from configs.db_config import engine
 from API import products, auth
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
 
@@ -18,14 +19,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Purchase Service API",
-    description="API for product purchasing operations",
+    title="purchase_service API",
     lifespan=lifespan
 )
 
-# connecting routers
-app.include_router(products.router)
+
 app.include_router(auth.router) 
+app.include_router(products.router)
 
 
 @app.get("/health", tags=["Health"])

@@ -2,14 +2,12 @@ from datetime import datetime, timezone
 from typing import Optional
 from extractor import extract_updated_products
 from loader import load_to_elasticsearch
-from shared.core.db_config import get_db_session_instance
+from configs.db_config import get_db_session_instance
 
 
-# variable to track last time synchonization
 last_sync_time: Optional[datetime] = None
 
 
-# performs ETL process to synchronize updated products with Elasticsearch
 async def run_etl():
     global last_sync_time
     current_sync_time = datetime.now(timezone.utc)
