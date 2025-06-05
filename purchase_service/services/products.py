@@ -1,11 +1,10 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.products import Product, UserProduct
-from repositories.products import ProductRepository
+from repositories.products import (ProductRepository,
+                                   UserProductRepository)
 from typing import Optional
 from fastapi import HTTPException
-from sqlmodel import select
-from sqlalchemy.orm import selectinload
 
 
 async def get_all_products(
@@ -53,15 +52,10 @@ async def return_product_by_id(
     repo = ProductRepository(db)
     product = await repo.get_by_id(product_id)
     
-    stmt = await db.execute(
-        select(UserProduct).where(
-            UserProduct.product_id == product_id,
-            UserProduct.user_id == user_id,
-            UserProduct.status == "purchased"
-        )
+    user_product = await UserProductRepository(db).get_purchased_product(
+        product_id,
+        user_id
     )
-
-    user_product = stmt.scalar_one_or_none()
     
     if not user_product:
         return False
@@ -83,8 +77,4 @@ async def get_user_products(
             detail="user id is required"
         )
     
-    stmt = select(UserProduct).where(UserProduct.user_id == user_id)
-    selectinload(UserProduct.product)
-
-    result = await db.execute(stmt)
-    return result.scalars().all()
+    return await UserProductRepository(db).get_all_products(user_id)
